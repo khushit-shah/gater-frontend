@@ -85,7 +85,7 @@ const FilterTags = (props) => {
         ))}
       </datalist> */}
       {isMyInputFocused && (
-        <ul className="absolute overflow-y-scroll flex flex-wrap ml-4 left-0 right-0 z-10 bg-white border rounded-lg shadow-lg">
+        <ul className="overflow-y-scroll h-full  absolute flex flex-wrap ml-4  z-10 bg-white border rounded-lg shadow-lg ">
           {tags
             .filter((option) =>
               option.toLowerCase().includes(value.toLowerCase())
