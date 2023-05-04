@@ -17,6 +17,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+      pages: "write"
     strategy:
       matrix:
         node-version: [18.x]
