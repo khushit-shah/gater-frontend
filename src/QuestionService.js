@@ -33,7 +33,6 @@ export class QuestionService {
     for(let tag of tags) {
         if(tag.startsWith("-")) {
             mustHave.add(tag.substr(1));
-            ors.add(tag.substr(1));
         }
         else {
             ors.add(tag);
