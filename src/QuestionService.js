@@ -10,7 +10,7 @@ export class QuestionService {
       this.loaded = true;
       cb();
     } else {
-      fetch("%PUBLIC_DIR%/questions-filtered.json")
+      fetch("questions-filtered.json")
         .then((data) => data.json())
         .then((data) => {
           this.questions = data;
