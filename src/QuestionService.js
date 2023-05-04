@@ -23,7 +23,7 @@ export class QuestionService {
 
   static getRandomQuestion(tags) {
     console.log(tags);
-    if(!tags || tags.length == 0) {
+    if(!tags || tags.length === 0) {
         console.log("aaa");
         return this.questions[Math.floor(Math.random() * this.questions.length)];
     }
@@ -52,7 +52,7 @@ export class QuestionService {
     })
 
     console.log(filtered);
-    if(filtered.length == 0) {
+    if(filtered.length === 0) {
         return {title: "Error: no question with this filters.", question: "", link:"", tags:[]};
     }
     return filtered[Math.floor(Math.random() * filtered.length)];

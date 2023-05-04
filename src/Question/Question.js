@@ -9,7 +9,7 @@ export default class Question extends Component {
             <h2 className="text-2xl font-medium pb-3">
               {this.props.question.title}
             </h2>
-            <MathJax className="text-gray-500 mt-1 leading-6 text-xl">
+            <MathJax dynamic="true" className="text-gray-500 mt-1 leading-6 text-xl">
               <div
                 dangerouslySetInnerHTML={{
                   __html: this.props.question.question

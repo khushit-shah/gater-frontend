@@ -1,4 +1,4 @@
-import React, { Component, useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { QuestionService } from "../QuestionService";
 
 const FilterTags = (props) => {
@@ -38,7 +38,7 @@ const FilterTags = (props) => {
             className={`px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100 cursor-pointer ${
               !option.startsWith("-")
                 ? "bg-green-200  hover:bg-blue-100"
-                : "bg-red-200 bg-gray-100"
+                : "bg-red-200 hover:bg-gray-100"
             }`}
             onContextMenu={(e) => {
                 console.log("hrer")
@@ -55,20 +55,20 @@ const FilterTags = (props) => {
               )
                 setSelectedTags([
                   ...selectedTags,
-                  e.button == 2 ? "-" + option : option,
+                  e.button === 2 ? "-" + option : option,
                 ]);
-              else if (e.button == 2 && !option.startsWith("-")) {
+              else if (e.button === 2 && !option.startsWith("-")) {
                 setSelectedTags([
-                  ...selectedTags.filter((val) => val != option),
+                  ...selectedTags.filter((val) => val !== option),
                   "-" + option,
                 ]);
-              } else if (e.button != 2 && option.startsWith("-")) {
+              } else if (e.button !== 2 && option.startsWith("-")) {
                 setSelectedTags([
-                  ...selectedTags.filter((val) => val != option),
+                  ...selectedTags.filter((val) => val !== option),
                   option.substr(1),
                 ]);
               } else {
-                setSelectedTags(selectedTags.filter((val) => val != option));
+                setSelectedTags(selectedTags.filter((val) => val !== option));
               }
             }}
           >
@@ -97,7 +97,7 @@ const FilterTags = (props) => {
                   selectedTags.includes(option)
                     ? "bg-green-200  hover:bg-blue-100"
                     : selectedTags.includes("-" + option)
-                    ? "bg-red-200 bg-gray-100"
+                    ? "bg-red-200 hover:bg-gray-100"
                     : "bg-blue-100 hover:bg-green-100"
                 }`}
                 onContextMenu={(e) => {
@@ -114,24 +114,24 @@ const FilterTags = (props) => {
                   )
                     setSelectedTags([
                       ...selectedTags,
-                      e.button == 2 ? "-" + option : option,
+                      e.button === 2 ? "-" + option : option,
                     ]);
-                  else if (e.button == 2 && selectedTags.includes(option)) {
+                  else if (e.button === 2 && selectedTags.includes(option)) {
                     setSelectedTags([
-                      ...selectedTags.filter((val) => val != option),
+                      ...selectedTags.filter((val) => val !== option),
                       "-" + option,
                     ]);
                   } else if (
-                    e.button != 2 &&
+                    e.button !== 2 &&
                     selectedTags.includes("-" + option)
                   ) {
                     setSelectedTags([
-                      ...selectedTags.filter((val) => val != "-" + option),
+                      ...selectedTags.filter((val) => val !== "-" + option),
                       option,
                     ]);
                   } else {
                     setSelectedTags(
-                      selectedTags.filter((val) => val != option)
+                      selectedTags.filter((val) => val !== option)
                     );
                   }
                 }}
