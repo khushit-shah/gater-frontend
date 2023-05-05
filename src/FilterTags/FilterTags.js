@@ -46,8 +46,6 @@ const FilterTags = (props) => {
               return false;
             }}
             onMouseDown={(e) => {
-              e.preventDefault();
-
               console.log(option);
               if (
                 !selectedTags.includes(option) &&
@@ -105,7 +103,6 @@ const FilterTags = (props) => {
                   return false;
                 }}
                 onMouseDown={(e) => {
-                  e.preventDefault();
                   console.log(e.button);
                   console.log(option);
                   if (
