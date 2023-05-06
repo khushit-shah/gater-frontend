@@ -108,7 +108,7 @@ const FilterTags = (props) => {
         ))}
       </datalist> */}
       {isMyInputFocused && (
-        <ul className="overflow-y-scroll h-full  absolute flex flex-wrap ml-4  z-10 bg-white border rounded-lg shadow-lg ">
+        <ul className="float flex flex-wrap ml-4  z-10 bg-white border rounded-lg shadow-lg ">
           {tags
             .filter((option) =>
               option.toLowerCase().includes(value.toLowerCase())
@@ -116,7 +116,7 @@ const FilterTags = (props) => {
             .map((option) => (
               <li
                 key={option}
-                className={`ml-1 px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100  ${
+                className={`grow-0 ml-1 px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100  ${
                   selectedTags.includes(option)
                     ? "bg-green-200"
                     : selectedTags.includes("-" + option)
