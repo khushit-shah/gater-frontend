@@ -17,7 +17,7 @@ const FilterTags = (props) => {
         htmlFor="filter"
         className="block mb-2  ml-3 mt-2 text-xl font-medium text-gray"
       >
-        Filter:
+        Filter: <span className="text-gray-400" title="How many possible tags combination for a question to be selected if there are m (^)(red) and n (v)(green) filte? (m!= 0, n!=0).">(All <span className="text-red-500"> ^ </span> and atleast one  <span className="text-green-500"> v </span> must be present in the tag for a question to be selected. <a href="/">example</a>)</span>
       </label>
       <input
         onBlur={(e) => setIsMyInputFocused(false)}
@@ -116,12 +116,12 @@ const FilterTags = (props) => {
             .map((option) => (
               <li
                 key={option}
-                className={`px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100 cursor-pointer ${
+                className={`ml-1 px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100  ${
                   selectedTags.includes(option)
-                    ? "bg-green-200  hover:bg-blue-100"
+                    ? "bg-green-200"
                     : selectedTags.includes("-" + option)
-                    ? "bg-red-200 hover:bg-gray-100"
-                    : "bg-blue-100 hover:bg-green-100"
+                    ? "bg-red-200"
+                    : "bg-gray-200"
                 }`}
                 onContextMenu={(e) => {
                   e.preventDefault();
