@@ -17,7 +17,7 @@ const FilterTags = (props) => {
         htmlFor="filter"
         className="block mb-2  ml-3 mt-2 text-xl font-medium text-gray"
       >
-        Filter: <span className="text-gray-400" title="How many possible tags combination for a question to be selected if there are m (^)(red) and n (v)(green) filte? (m!= 0, n!=0).">(All <span className="text-red-500"> ^ </span> and atleast one  <span className="text-green-500"> v </span> must be present in the tag for a question to be selected. <a href="/">example</a>)</span>
+        Filter: <span className="text-gray-400" title="How many possible tags combination for a question to be selected if there are m (^)(red) and n (v)(green) filte? (m!= 0, n!=0).">(All <span className="text-red-500"> ^ </span> and atleast one  <span className="text-green-500"> v </span> must be present in the tag for a question to be selected. <a target="_blank" rel="noreferrer" href="https://github.com/khushit-shah/gater-frontend#working-of-filters">example</a>)</span>
       </label>
       <input
         onBlur={(e) => setIsMyInputFocused(false)}
