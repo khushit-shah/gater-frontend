@@ -10,8 +10,7 @@ const FilterTags = (props) => {
   const setSelectedTags = (selectedTags) => {
     setSelectedTags1(selectedTags);
     props.tagsSelected(selectedTags);
-
-  }
+  };
   return (
     <div className="mb-6 mr-6">
       <label
@@ -32,50 +31,76 @@ const FilterTags = (props) => {
         onChange={(e) => setValue(e.target.value)}
       />
       <div className="flex flex-wrap ml-3">
-        {selectedTags.map((option) => (
-          <li
-            key={option}
-            className={`px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100 cursor-pointer ${
-              !option.startsWith("-")
-                ? "bg-green-200  hover:bg-blue-100"
-                : "bg-red-200 hover:bg-gray-100"
-            }`}
-            onContextMenu={(e) => {
-                console.log("hrer")
+        {selectedTags.map((option) => {
+          if (option.startsWith("-")) {
+            option = option.substr(1);
+          }
+          return (
+            <li
+              key={option}
+              className={`px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100 cursor-pointer ${
+                selectedTags.includes(option)
+                  ? "bg-green-200  hover:bg-blue-100"
+                  : selectedTags.includes("-" + option)
+                  ? "bg-red-200 hover:bg-gray-100"
+                  : "bg-blue-100 hover:bg-green-100"
+              }`}
+              onContextMenu={(e) => {
+                console.log("hrer");
                 e.preventDefault();
-              return false;
-            }}
-            onMouseDown={(e) => {
-              console.log(option);
-              if (
-                !selectedTags.includes(option) &&
-                !selectedTags.includes("-" + option)
-              )
-                setSelectedTags([
-                  ...selectedTags,
-                  e.button === 2 ? "-" + option : option,
-                ]);
-              else if (e.button === 2 && !option.startsWith("-")) {
-                setSelectedTags([
-                  ...selectedTags.filter((val) => val !== option),
-                  "-" + option,
-                ]);
-              } else if (e.button !== 2 && option.startsWith("-")) {
-                setSelectedTags([
-                  ...selectedTags.filter((val) => val !== option),
-                  option.substr(1),
-                ]);
-              } else {
-                setSelectedTags(selectedTags.filter((val) => val !== option));
-              }
-            }}
-          >
-            {option.startsWith("-") ? option.substr(1) : option} x
-            {QuestionService.getCount(
-              option.startsWith("-") ? option.substr(1) : option
-            )}
-          </li>
-        ))}
+                return false;
+              }}
+            >
+              {option} x({QuestionService.getCount(option)})
+              {!selectedTags.includes("-" + option) ? (
+                <button
+                  className="mr-1 ml-1 border rounded-full w-25 border-red-600 bg-red-200 pl-3 pr-3"
+                  onMouseDown={(e) => {
+                    setSelectedTags([
+                      ...selectedTags.filter((s) => s !== option),
+                      "-" + option,
+                    ]);
+                  }}
+                >
+                  ^
+                </button>
+              ) : (
+                <button
+                  className="mr-1 ml-1 border rounded-full w-25 border-gray-700 bg-gray-300 pl-3 pr-3"
+                  onMouseDown={(e) => {
+                    setSelectedTags(
+                      selectedTags.filter((s) => s !== "-" + option)
+                    );
+                  }}
+                >
+                  -
+                </button>
+              )}
+              {!selectedTags.includes(option) ? (
+                <button
+                  className="mr-1 ml-1 border rounded-full w-25 border-green-600 bg-green-200 pl-3 pr-3"
+                  onMouseDown={(e) => {
+                    setSelectedTags([
+                      ...selectedTags.filter((s) => s !== "-" + option),
+                      option,
+                    ]);
+                  }}
+                >
+                  v
+                </button>
+              ) : (
+                <button
+                  className="mr-1 ml-1 border rounded-full w-25 border-gray-700 pl-3 pr-3 bg-gray-300"
+                  onMouseDown={(e) => {
+                    setSelectedTags(selectedTags.filter((s) => s !== option));
+                  }}
+                >
+                  -
+                </button>
+              )}
+            </li>
+          );
+        })}
       </div>
       {/* <datalist id="tags">
         {tags.map((option) => (
@@ -99,41 +124,57 @@ const FilterTags = (props) => {
                     : "bg-blue-100 hover:bg-green-100"
                 }`}
                 onContextMenu={(e) => {
-                    e.preventDefault();
+                  e.preventDefault();
                   return false;
                 }}
-                onMouseDown={(e) => {
-                  console.log(e.button);
-                  console.log(option);
-                  if (
-                    !selectedTags.includes(option) &&
-                    !selectedTags.includes("-" + option)
-                  )
-                    setSelectedTags([
-                      ...selectedTags,
-                      e.button === 2 ? "-" + option : option,
-                    ]);
-                  else if (e.button === 2 && selectedTags.includes(option)) {
-                    setSelectedTags([
-                      ...selectedTags.filter((val) => val !== option),
-                      "-" + option,
-                    ]);
-                  } else if (
-                    e.button !== 2 &&
-                    selectedTags.includes("-" + option)
-                  ) {
-                    setSelectedTags([
-                      ...selectedTags.filter((val) => val !== "-" + option),
-                      option,
-                    ]);
-                  } else {
-                    setSelectedTags(
-                      selectedTags.filter((val) => val !== option)
-                    );
-                  }
-                }}
               >
-                {option} x{QuestionService.getCount(option)}
+                {option} x({QuestionService.getCount(option)})
+                {!selectedTags.includes("-" + option) ? (
+                  <button
+                    className="mr-1 ml-1 border rounded-full w-25 border-red-600 bg-red-200 pl-3 pr-3"
+                    onMouseDown={(e) => {
+                      setSelectedTags([
+                        ...selectedTags.filter((s) => s !== option),
+                        "-" + option,
+                      ]);
+                    }}
+                  >
+                    ^
+                  </button>
+                ) : (
+                  <button
+                    className="mr-1 ml-1 border rounded-full w-25 border-gray-700 bg-gray-300 pl-3 pr-3"
+                    onMouseDown={(e) => {
+                      setSelectedTags(
+                        selectedTags.filter((s) => s !== "-" + option)
+                      );
+                    }}
+                  >
+                    -
+                  </button>
+                )}
+                {!selectedTags.includes(option) ? (
+                  <button
+                    className="mr-1 ml-1 border rounded-full w-25 border-green-600 bg-green-200 pl-3 pr-3"
+                    onMouseDown={(e) => {
+                      setSelectedTags([
+                        ...selectedTags.filter((s) => s !== "-" + option),
+                        option,
+                      ]);
+                    }}
+                  >
+                    v
+                  </button>
+                ) : (
+                  <button
+                    className="mr-1 ml-1 border rounded-full w-25 border-gray-700 pl-3 pr-3 bg-gray-300"
+                    onMouseDown={(e) => {
+                      setSelectedTags(selectedTags.filter((s) => s !== option));
+                    }}
+                  >
+                    -
+                  </button>
+                )}
               </li>
             ))}
         </ul>
