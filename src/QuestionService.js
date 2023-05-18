@@ -10,7 +10,7 @@ export class QuestionService {
       this.loaded = true;
       cb();
     } else {
-      fetch("questions-filtered.json")
+      fetch("/gater-frontend/questions-filtered.json")
         .then((data) => data.json())
         .then((data) => {
           this.questions = data;
@@ -27,26 +27,35 @@ export class QuestionService {
       console.log("aaa");
       return this.questions[Math.floor(Math.random() * this.questions.length)];
     }
-    let mustHave = new Set();
-    let ors = new Set();
+    let year = new Set();
+    let tag = new Set();
 
-    for (let tag of tags) {
-      if (tag.startsWith("-")) {
-        mustHave.add(tag.substr(1));
+    for (let t of tags) {
+      if (t.startsWith("gate")) {
+        year.add(t);
       } else {
-        ors.add(tag);
+        tag.add(t);
       }
     }
-    console.log(mustHave);
-    console.log(ors);
+    console.log(year);
+    console.log(tag);
+
     let filtered = this.questions.filter((question) => {
-      for (let must of mustHave) {
-        if (!question.tags.includes(must)) return false;
+      let valid = false;
+      for (let y of year) {
+        if (question.tags.includes(y)) {
+          valid = true;
+          break;
+        }
       }
-      for (let or of ors) {
-        if (question.tags.includes(or)) return true;
+      if (!valid && year.size !== 0) return false;
+
+      for (let t of tag) {
+        if (question.tags.includes(t)) return true;
       }
-      if (ors.size === 0) return true;
+
+      if (tag.size === 0) return true;
+
       return false;
     });
 

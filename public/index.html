@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head><!-- Google tag (gtag.js) -->
+  <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V2VB8QYQLV"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-V2VB8QYQLV"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-  gtag('config', 'G-V2VB8QYQLV');
-</script>
+      gtag("config", "G-V2VB8QYQLV");
+    </script>
     <script>
       MathJax = {
         tex: {
@@ -21,6 +27,7 @@
         },
         svg: {
           fontCache: "global",
+          linebreaks: { automatic: true },
         },
       };
     </script>
@@ -48,9 +55,13 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>GateR - Random GATE CSE PYQ</title>
+    <style>
+      pre {
+        overflow: auto;
+      }
+    </style>
   </head>
   <body>
-
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--

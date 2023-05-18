@@ -12,15 +12,15 @@ const FilterTags = (props) => {
     props.tagsSelected(selectedTags);
   };
   return (
-    <div className="mb-6 mr-6">
+    <div className="mb-6 mr-6 relative">
       <label
         htmlFor="filter"
         className="block mb-2  ml-3 mt-2 text-xl font-medium text-gray"
       >
-        Filter: <span className="text-gray-400" title="How many possible tags combination for a question to be selected if there are m (^)(red) and n (v)(green) filte? (m!= 0, n!=0).">(All <span className="text-red-500"> ^ </span> and atleast one  <span className="text-green-500"> v </span> must be present in the tag for a question to be selected. <a target="_blank" rel="noreferrer" href="https://github.com/khushit-shah/gater-frontend#working-of-filters">example</a>)</span>
+        Filter:
       </label>
       <input
-        onBlur={(e) => setIsMyInputFocused(false)}
+        // onBlur={(e) => setIsMyInputFocused(false)}
         onFocus={() => setIsMyInputFocused(true)}
         type="text"
         id="filter"
@@ -30,153 +30,103 @@ const FilterTags = (props) => {
         list="tags"
         onChange={(e) => setValue(e.target.value)}
       />
-      <div className="flex flex-wrap ml-3">
+      <div className="flex flex-wrap ml-3 list-none">
         {selectedTags.map((option) => {
-          if (option.startsWith("-")) {
-            option = option.substr(1);
-          }
           return (
-            <li
-              key={option}
-              className={`px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100 cursor-pointer ${
-                selectedTags.includes(option)
-                  ? "bg-green-200  hover:bg-blue-100"
-                  : selectedTags.includes("-" + option)
-                  ? "bg-red-200 hover:bg-gray-100"
-                  : "bg-blue-100 hover:bg-green-100"
-              }`}
-              onContextMenu={(e) => {
-                console.log("hrer");
-                e.preventDefault();
-                return false;
-              }}
-            >
-              {option} x({QuestionService.getCount(option)})
-              {!selectedTags.includes("-" + option) ? (
-                <button
-                  className="mr-1 ml-1 border rounded-full w-25 border-red-600 bg-red-200 pl-3 pr-3"
-                  onMouseDown={(e) => {
-                    setSelectedTags([
-                      ...selectedTags.filter((s) => s !== option),
-                      "-" + option,
-                    ]);
-                  }}
-                >
-                  ^
-                </button>
-              ) : (
-                <button
-                  className="mr-1 ml-1 border rounded-full w-25 border-gray-700 bg-gray-300 pl-3 pr-3"
-                  onMouseDown={(e) => {
-                    setSelectedTags(
-                      selectedTags.filter((s) => s !== "-" + option)
-                    );
-                  }}
-                >
-                  -
-                </button>
-              )}
-              {!selectedTags.includes(option) ? (
-                <button
-                  className="mr-1 ml-1 border rounded-full w-25 border-green-600 bg-green-200 pl-3 pr-3"
-                  onMouseDown={(e) => {
-                    setSelectedTags([
-                      ...selectedTags.filter((s) => s !== "-" + option),
-                      option,
-                    ]);
-                  }}
-                >
-                  v
-                </button>
-              ) : (
-                <button
-                  className="mr-1 ml-1 border rounded-full w-25 border-gray-700 pl-3 pr-3 bg-gray-300"
-                  onMouseDown={(e) => {
-                    setSelectedTags(selectedTags.filter((s) => s !== option));
-                  }}
-                >
-                  -
-                </button>
-              )}
+            <li className="rounded border ml-1 px-4 py-2 mr-1 mb-1 mt-1">
+              <input
+                type="checkbox"
+                checked={true}
+                key={option}
+                id={option}
+                className={`border-black border ml-1 px-4 py-2 mr-1 mb-1 mt-1`}
+                onChange={(e) => {
+                  setSelectedTags(selectedTags.filter((e) => e !== option));
+                }}
+              />
+              <label className="text-black" htmlFor={option}>
+                {option} x({QuestionService.getCount(option)})
+              </label>
             </li>
           );
         })}
       </div>
-      {/* <datalist id="tags">
-        {tags.map((option) => (
-          <option key={option} value={option} />
-        ))}
-      </datalist> */}
+
       {isMyInputFocused && (
-        <ul className="float flex flex-wrap ml-4  z-10 bg-white border rounded-lg shadow-lg ">
-          {tags
-            .filter((option) =>
-              option.toLowerCase().includes(value.toLowerCase())
-            )
-            .map((option) => (
-              <li
-                key={option}
-                className={`grow-0 ml-1 px-4 py-2 mr-1 mb-1 mt-1 rounded  hover:bg-gray-100  ${
-                  selectedTags.includes(option)
-                    ? "bg-green-200"
-                    : selectedTags.includes("-" + option)
-                    ? "bg-red-200"
-                    : "bg-gray-200"
-                }`}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  return false;
-                }}
-              >
-                {option} x({QuestionService.getCount(option)})
-                {!selectedTags.includes("-" + option) ? (
-                  <button
-                    className="mr-1 ml-1 border rounded-full w-25 border-red-600 bg-red-200 pl-3 pr-3"
-                    onMouseDown={(e) => {
-                      setSelectedTags([
-                        ...selectedTags.filter((s) => s !== option),
-                        "-" + option,
-                      ]);
+        <ul className="float flex flex-wrap  absolute top-0 left-0  z-10 bg-white border rounded-lg shadow-lg ">
+          <button className="fixed right-7 mr-5 mt-3 text-2xl border border-black  p-0.5" onClick={(e) => {
+            setIsMyInputFocused(false)
+          }}> x </button>
+
+          <div className="flex-none w-[300px]">
+            <p className="text-bold text-xl m-4"> Paper: </p>
+            {tags
+              .filter(
+                (option) =>
+                  option.toLowerCase().includes(value.toLowerCase()) &&
+                  option.toLowerCase().startsWith("gate")
+              )
+              .map((option) => (
+                <li className="rounded border ml-1 px-4 py-2 mr-1 mb-1 mt-1">
+                  <input
+                    type="checkbox"
+                    key={option}
+                    id={option}
+                    checked={selectedTags.includes(option)}
+                    onChange={(e) => {
+                      if (selectedTags.includes(option)) {
+                        setSelectedTags(
+                          selectedTags.filter((s) => s !== option)
+                        );
+                      } else {
+                        setSelectedTags([...selectedTags, option]);
+                      }
                     }}
-                  >
-                    ^
-                  </button>
-                ) : (
-                  <button
-                    className="mr-1 ml-1 border rounded-full w-25 border-gray-700 bg-gray-300 pl-3 pr-3"
-                    onMouseDown={(e) => {
-                      setSelectedTags(
-                        selectedTags.filter((s) => s !== "-" + option)
-                      );
-                    }}
-                  >
-                    -
-                  </button>
-                )}
-                {!selectedTags.includes(option) ? (
-                  <button
-                    className="mr-1 ml-1 border rounded-full w-25 border-green-600 bg-green-200 pl-3 pr-3"
-                    onMouseDown={(e) => {
-                      setSelectedTags([
-                        ...selectedTags.filter((s) => s !== "-" + option),
-                        option,
-                      ]);
-                    }}
-                  >
-                    v
-                  </button>
-                ) : (
-                  <button
-                    className="mr-1 ml-1 border rounded-full w-25 border-gray-700 pl-3 pr-3 bg-gray-300"
-                    onMouseDown={(e) => {
-                      setSelectedTags(selectedTags.filter((s) => s !== option));
-                    }}
-                  >
-                    -
-                  </button>
-                )}
-              </li>
-            ))}
+                  />
+                  <label className="ml-4" htmlFor={option}>
+                    {option} x({QuestionService.getCount(option)})
+                  </label>
+                </li>
+              ))}
+          </div>
+          <div className="flex-1 ">
+            <p className="text-bold text-xl m-4"> Tags: </p>
+            <div className="flex flex-wrap">
+              {tags
+                .filter(
+                  (option) =>
+                    option.toLowerCase().includes(value.toLowerCase()) &&
+                    !option.toLowerCase().startsWith("gate")
+                )
+                .map((option) => {
+                  console.log(option);
+                  return (
+                    <>
+                      <li className="rounded border ml-1 px-4 py-2 mr-1 mb-1 mt-1">
+                        <input
+                          type="checkbox"
+                          key={option}
+                          id={option}
+                          checked={selectedTags.includes(option)}
+                          onChange={(e) => {
+                            if (selectedTags.includes(option)) {
+                              setSelectedTags(
+                                selectedTags.filter((s) => s !== option)
+                              );
+                            } else {
+                              setSelectedTags([...selectedTags, option]);
+                            }
+                          }}
+                        />
+                        <label className="ml-4" htmlFor={option}>
+                          {option} x({QuestionService.getCount(option)})
+                        </label>
+                      </li>
+                    </>
+                  );
+                })}
+            </div>
+          </div>
         </ul>
       )}
     </div>
