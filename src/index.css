@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 ol, ul {
-  padding-left: 10px !important;
+  list-style-position: inside;
 }
