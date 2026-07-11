@@ -8,19 +8,19 @@ The app is best represented by these four screens:
 
 ### Light mode
 
-![GateR light mode screenshot](public/light.png)
+![GateR light mode screenshot](./public/light.png)
 
 ### Dark mode
 
-![GateR dark mode screenshot](public/dark.png)
+![GateR dark mode screenshot](./public/dark.png)
 
 ### Many filters
 
-![GateR filter selection screenshot](public/many-filters.png)
+![GateR filter selection screenshot](./public/many-filters.png)
 
 ### Apply multiple filters
 
-![GateR applying multiple filters screenshot](public/apply-multiple-filters.png)
+![GateR applying multiple filters screenshot](./public/apply-multiple-filters.png)
 
 ## What it does
 
