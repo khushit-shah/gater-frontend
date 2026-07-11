@@ -16,7 +16,7 @@ const themeOptions = [
   },
 ];
 
-export default function Footer({ themePreference, onThemeChange }) {
+export default function Footer({ themePreference, onThemeChange, onTrackEvent }) {
   return (
     <footer className="border-t border-slate-300 bg-white/90 px-4 py-4 text-slate-700 backdrop-blur dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-200 md:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -67,7 +67,13 @@ export default function Footer({ themePreference, onThemeChange }) {
                 <button
                   key={value}
                   type="button"
-                  onClick={() => onThemeChange(value)}
+                  onClick={() => {
+                    onTrackEvent?.("theme_change", {
+                      previous_theme: themePreference,
+                      selected_theme: value,
+                    });
+                    onThemeChange(value);
+                  }}
                   className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition ${
                     active
                       ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"

@@ -54,11 +54,21 @@ const FilterTags = (props) => {
   };
 
   const toggleTag = (option) => {
+    const isRemoving = selectedTags.includes(option);
     if (selectedTags.includes(option)) {
       setSelectedTags(selectedTags.filter((tag) => tag !== option));
     } else {
       setSelectedTags([...selectedTags, option]);
     }
+
+    props.onTrackEvent?.("filter_tag_toggle", {
+      action: isRemoving ? "remove" : "add",
+      tag: option,
+      selected_filter_count: isRemoving ? selectedTags.length - 1 : selectedTags.length + 1,
+      selected_filter_tags: isRemoving
+        ? selectedTags.filter((tag) => tag !== option).join(",")
+        : [...selectedTags, option].join(","),
+    });
   };
 
   const query = value.trim().toLowerCase();
@@ -174,6 +184,12 @@ const FilterTags = (props) => {
             type="button"
             onClick={props.onSaveFilteredList}
             disabled={!props.canSaveFilteredList}
+            onMouseDown={() =>
+              props.onTrackEvent?.("save_filtered_list_click", {
+                selected_filter_count: selectedTags.length,
+                selected_filter_tags: selectedTags.join(","),
+              })
+            }
             className="inline-flex items-center justify-center rounded-full bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 dark:bg-sky-500 dark:hover:bg-sky-400 dark:disabled:bg-slate-700 dark:disabled:text-slate-400"
           >
             Save filtered list

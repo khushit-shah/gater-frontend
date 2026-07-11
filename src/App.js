@@ -7,6 +7,7 @@ import FilterTags from "./FilterTags/FilterTags";
 import { QuestionService } from "./QuestionService";
 import QuestionLists from "./QuestionLists/QuestionLists";
 import ListEditorModal from "./QuestionLists/ListEditorModal";
+import { buildAnalyticsContext, sendAnalyticsEvent } from "./analytics";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -76,6 +77,19 @@ function App() {
       return;
     }
 
+    sendAnalyticsEvent("filter_change", {
+      action: "selection_changed",
+      filter_tags: filterTags.join(","),
+      selected_filter_count: filterTags.length,
+      active_list_id: activeListId,
+    });
+  }, [filterTags, loading, activeListId]);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
     if (activeListId !== "all" && !savedLists.some((list) => list.id === activeListId)) {
       setActiveListId("all");
     }
@@ -118,14 +132,37 @@ function App() {
           tags: [],
         };
 
+  const analyticsContext = buildAnalyticsContext({
+    activeList,
+    currentIndex,
+    currentQuestion,
+    filterTags,
+    savedLists,
+    totalQuestions: activeQuestions.length,
+  });
+
+  const trackEvent = (eventName, params = {}) => {
+    sendAnalyticsEvent(eventName, {
+      ...analyticsContext,
+      ...params,
+    });
+  };
+
   const selectList = (listId) => {
     setActiveListId(listId);
+    trackEvent("select_list", {
+      selected_list_id: listId,
+    });
   };
 
   const openCreateListModal = () => {
     if (filterTags.length === 0 || activeQuestions.length === 0) {
       return;
     }
+
+    trackEvent("open_create_list_modal", {
+      candidate_questions: activeQuestions.length,
+    });
 
     setListEditor({
       mode: "create",
@@ -138,6 +175,11 @@ function App() {
   };
 
   const openEditListModal = (list) => {
+    trackEvent("open_edit_list_modal", {
+      selected_list_id: list.id,
+      candidate_questions: activeQuestions.length,
+    });
+
     setListEditor({
       mode: "edit",
       listId: list.id,
@@ -149,7 +191,18 @@ function App() {
   };
 
   const closeListEditor = () => {
+    if (!listEditor) {
+      return;
+    }
+
+    const editor = listEditor;
     setListEditor(null);
+    trackEvent("list_editor_cancel", {
+      mode: editor.mode,
+      list_id: editor.listId || null,
+      question_count: editor.currentQuestionIds?.length || 0,
+      name_length: (editor.name || "").trim().length,
+    });
   };
 
   const submitListEditor = ({ name, useCurrentFilters }) => {
@@ -157,28 +210,50 @@ function App() {
       return;
     }
 
-    if (listEditor.mode === "create") {
+    const editor = listEditor;
+    const trimmedName = name.trim();
+    const shouldUseCurrentFilters = Boolean(useCurrentFilters && editor.currentQuestionIds.length > 0);
+
+    trackEvent("list_editor_submit", {
+      mode: editor.mode,
+      list_id: editor.listId || null,
+      question_count: editor.currentQuestionIds?.length || 0,
+      name_length: trimmedName.length,
+      used_current_filters: shouldUseCurrentFilters,
+    });
+
+    if (editor.mode === "create") {
       const list = QuestionService.createList(
-        name,
-        listEditor.currentQuestionIds,
-        listEditor.currentFilterTags
+        trimmedName,
+        editor.currentQuestionIds,
+        editor.currentFilterTags
       );
       const nextLists = QuestionService.addList(list);
       setSavedLists(nextLists);
       setActiveListId(list.id);
       setListEditor(null);
+      trackEvent("create_list", {
+        created_list_id: list.id,
+        created_list_name: list.name,
+        created_question_count: list.questionIds.length,
+        used_current_filters: shouldUseCurrentFilters,
+      });
       return;
     }
 
-    const updates = { name };
-    if (useCurrentFilters && listEditor.currentQuestionIds.length > 0) {
-      updates.questionIds = listEditor.currentQuestionIds;
-      updates.sourceTags = listEditor.currentFilterTags;
+    const updates = { name: trimmedName };
+    if (shouldUseCurrentFilters) {
+      updates.questionIds = editor.currentQuestionIds;
+      updates.sourceTags = editor.currentFilterTags;
     }
 
-    const nextLists = QuestionService.updateList(listEditor.listId, updates);
+    const nextLists = QuestionService.updateList(editor.listId, updates);
     setSavedLists(nextLists);
     setListEditor(null);
+    trackEvent("update_list", {
+      updated_list_id: editor.listId,
+      updated_question_count: updates.questionIds?.length || 0,
+    });
   };
 
   const deleteList = (listId) => {
@@ -197,6 +272,9 @@ function App() {
     if (activeListId === listId) {
       setActiveListId("all");
     }
+    trackEvent("delete_list", {
+      deleted_list_id: listId,
+    });
   };
 
   const stepQuestion = (delta) => {
@@ -204,6 +282,9 @@ function App() {
       return;
     }
     setCurrentIndex((previousIndex) => previousIndex + delta);
+    trackEvent(delta > 0 ? "next_question" : "previous_question", {
+      navigation_delta: delta,
+    });
   };
 
   return (
@@ -244,6 +325,7 @@ function App() {
                     setFilterTags(tags);
                   }}
                   onSaveFilteredList={openCreateListModal}
+                  onTrackEvent={trackEvent}
                   canSaveFilteredList={filterTags.length > 0 && activeQuestions.length > 0}
                 ></FilterTags>
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
@@ -260,6 +342,7 @@ function App() {
                       totalQuestions={activeQuestions.length}
                       onPrevious={() => stepQuestion(-1)}
                       onNext={() => stepQuestion(1)}
+                      onTrackEvent={trackEvent}
                     ></Question>
                   </div>
                   <div className="order-2 lg:order-2">
@@ -272,6 +355,7 @@ function App() {
                       onSelectList={selectList}
                       onEditList={openEditListModal}
                       onDeleteList={deleteList}
+                      onTrackEvent={trackEvent}
                     />
                   </div>
                 </div>
@@ -282,6 +366,7 @@ function App() {
           <Footer
             themePreference={themePreference}
             onThemeChange={setThemePreference}
+            onTrackEvent={trackEvent}
           ></Footer>
 
           <ListEditorModal
