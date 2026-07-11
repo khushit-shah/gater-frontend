@@ -68,6 +68,10 @@ function App() {
   }, [activeListId]);
 
   useEffect(() => {
+    setCurrentIndex(0);
+  }, [filterTags]);
+
+  useEffect(() => {
     if (loading) {
       return;
     }
@@ -84,7 +88,6 @@ function App() {
     document.documentElement.style.colorScheme = resolvedTheme;
   }, [themePreference, systemTheme]);
 
-  const filteredQuestions = QuestionService.getFilteredQuestions(filterTags);
   const activeListBase =
     activeListId === "all"
       ? {
@@ -97,7 +100,10 @@ function App() {
           name: "All questions",
           questionIds: QuestionService.getGlobalQuestionIds(),
         };
-  const activeQuestions = QuestionService.getQuestionsByIds(activeListBase.questionIds || []);
+  const activeQuestions = QuestionService.getQuestionsByIdsAndTags(
+    activeListBase.questionIds || [],
+    filterTags
+  );
   const activeList = {
     ...activeListBase,
     questionCount: activeQuestions.length,
@@ -117,7 +123,7 @@ function App() {
   };
 
   const openCreateListModal = () => {
-    if (filterTags.length === 0 || filteredQuestions.length === 0) {
+    if (filterTags.length === 0 || activeQuestions.length === 0) {
       return;
     }
 
@@ -127,7 +133,7 @@ function App() {
       name: `Filtered list ${savedLists.length + 1}`,
       listName: "",
       currentFilterTags: [...filterTags],
-      currentQuestionIds: filteredQuestions.map((question) => question.id),
+      currentQuestionIds: activeQuestions.map((question) => question.id),
     });
   };
 
@@ -138,7 +144,7 @@ function App() {
       name: list.name,
       listName: list.name,
       currentFilterTags: [...filterTags],
-      currentQuestionIds: filteredQuestions.map((question) => question.id),
+      currentQuestionIds: activeQuestions.map((question) => question.id),
     });
   };
 
@@ -238,7 +244,7 @@ function App() {
                     setFilterTags(tags);
                   }}
                   onSaveFilteredList={openCreateListModal}
-                  canSaveFilteredList={filterTags.length > 0 && filteredQuestions.length > 0}
+                  canSaveFilteredList={filterTags.length > 0 && activeQuestions.length > 0}
                 ></FilterTags>
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
                   <div className="order-1 lg:order-1">
@@ -261,7 +267,7 @@ function App() {
                       activeList={activeList}
                       activeListId={activeListId}
                       filterTags={filterTags}
-                      filteredCount={filteredQuestions.length}
+                      filteredCount={activeQuestions.length}
                       savedLists={savedLists}
                       onSelectList={selectList}
                       onEditList={openEditListModal}

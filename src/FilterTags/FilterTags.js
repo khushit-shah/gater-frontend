@@ -202,14 +202,6 @@ const FilterTags = (props) => {
 
           <div className="grid max-h-[70vh] items-start gap-4 overflow-auto p-5 md:grid-cols-2">
             {renderOptionList({
-              title: "Paper",
-              emptyText: "No papers match your search.",
-              options: gateTags,
-              buttonClassName:
-                "flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-sky-300 hover:bg-sky-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-sky-500/50 dark:hover:bg-slate-800",
-              accentClassName: "md:col-span-1",
-            })}
-            {renderOptionList({
               title: "Marks",
               emptyText: "No mark filters match your search.",
               options: markTags,
@@ -224,6 +216,14 @@ const FilterTags = (props) => {
               options: questionTypeTags,
               buttonClassName:
                 "flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-violet-300 hover:bg-violet-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-violet-500/50 dark:hover:bg-slate-800",
+              accentClassName: "md:col-span-1",
+            })}
+            {renderOptionList({
+              title: "Paper",
+              emptyText: "No papers match your search.",
+              options: gateTags,
+              buttonClassName:
+                "flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-sky-300 hover:bg-sky-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-sky-500/50 dark:hover:bg-slate-800",
               accentClassName: "md:col-span-1",
             })}
             {renderOptionList({

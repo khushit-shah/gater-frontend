@@ -90,6 +90,18 @@ export class QuestionService {
     return ids.map((id) => byId.get(id)).filter(Boolean);
   }
 
+  static getQuestionsByIdsAndTags(ids, tags) {
+    const questionsById = new Map(this.questions.map((question) => [question.id, question]));
+    const allowedIds =
+      tags && tags.length > 0
+        ? new Set(this.getFilteredQuestions(tags).map((question) => question.id))
+        : null;
+
+    return ids
+      .map((id) => questionsById.get(id))
+      .filter((question) => question && (!allowedIds || allowedIds.has(question.id)));
+  }
+
   static getFilteredQuestions(tags) {
     if (!tags || tags.length === 0) {
       return this.questions;
@@ -272,7 +284,7 @@ export class QuestionService {
     return {
       id: listId,
       name: trimmedName,
-      questionIds: this.shuffleArray([...new Set(questionIds)]),
+      questionIds: [...new Set(questionIds)],
       sourceTags: [...new Set(sourceTags)],
       createdAt: new Date().toISOString(),
     };
@@ -298,7 +310,7 @@ export class QuestionService {
       }
 
       if (Array.isArray(updates.questionIds)) {
-        nextList.questionIds = this.shuffleArray([...new Set(updates.questionIds)]);
+        nextList.questionIds = [...new Set(updates.questionIds)];
       }
 
       if (Array.isArray(updates.sourceTags)) {
