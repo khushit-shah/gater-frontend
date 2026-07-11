@@ -76,19 +76,28 @@ const FilterTags = (props) => {
   );
   const totalResults = gateTags.length + markTags.length + questionTypeTags.length + topicTags.length;
 
-  const renderOptionList = ({ title, emptyText, options, buttonClassName, accentClassName }) => (
-    <div className={`rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950 ${accentClassName}`}>
+  const renderOptionList = ({
+    title,
+    emptyText,
+    options,
+    buttonClassName,
+    accentClassName,
+    compact = false,
+  }) => (
+    <div
+      className={`self-start rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950 ${accentClassName}`}
+    >
       <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
         {title}
       </p>
-      <ul className="space-y-2">
+      <ul className={compact ? "flex flex-wrap gap-2" : "space-y-2"}>
         {options.length === 0 ? (
           <li className="rounded-2xl border border-dashed border-slate-400 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
             {emptyText}
           </li>
         ) : (
           options.map((option) => (
-            <li key={option.value ?? option}>
+            <li key={option.value ?? option} className={compact ? "flex-1 min-w-[140px]" : ""}>
               <label className={buttonClassName}>
                 <span className="pr-3">
                   <input
@@ -182,21 +191,23 @@ const FilterTags = (props) => {
             </div>
           </div>
 
-          <div className="grid max-h-[70vh] overflow-auto gap-4 p-5 md:grid-cols-2">
+          <div className="grid max-h-[70vh] items-start gap-4 overflow-auto p-5 md:grid-cols-2">
             {renderOptionList({
               title: "Paper",
               emptyText: "No papers match your search.",
               options: gateTags,
               buttonClassName:
                 "flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-sky-300 hover:bg-sky-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-sky-500/50 dark:hover:bg-slate-800",
-              accentClassName: "md:border-r-0",
+              accentClassName: "md:col-span-1",
             })}
             {renderOptionList({
               title: "Marks",
               emptyText: "No mark filters match your search.",
               options: markTags,
               buttonClassName:
-                "flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-amber-300 hover:bg-amber-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-amber-500/50 dark:hover:bg-slate-800",
+                "inline-flex w-full cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-2.5 text-slate-700 transition hover:border-amber-300 hover:bg-amber-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-amber-500/50 dark:hover:bg-slate-800",
+              accentClassName: "md:col-span-1",
+              compact: true,
             })}
             {renderOptionList({
               title: "Question type",
@@ -204,6 +215,7 @@ const FilterTags = (props) => {
               options: questionTypeTags,
               buttonClassName:
                 "flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-violet-300 hover:bg-violet-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-violet-500/50 dark:hover:bg-slate-800",
+              accentClassName: "md:col-span-1",
             })}
             {renderOptionList({
               title: "Topics",
@@ -211,6 +223,7 @@ const FilterTags = (props) => {
               options: topicTags,
               buttonClassName:
                 "flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:bg-slate-800",
+              accentClassName: "md:col-span-1",
             })}
           </div>
         </div>
