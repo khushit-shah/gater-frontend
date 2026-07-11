@@ -94,6 +94,20 @@ const FilterTags = (props) => {
             ))}
           </ul>
         </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={props.onSaveFilteredList}
+            disabled={!props.canSaveFilteredList}
+            className="inline-flex items-center justify-center rounded-full bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 dark:bg-sky-500 dark:hover:bg-sky-400 dark:disabled:bg-slate-700 dark:disabled:text-slate-400"
+          >
+            Save filtered list
+          </button>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Create a persistent list from the currently selected filters.
+          </p>
+        </div>
       </div>
 
       {isMyInputFocused && (
