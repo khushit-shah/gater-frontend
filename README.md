@@ -100,7 +100,7 @@ The repository is configured for GitHub Pages deployment.
 The published site is expected to live at:
 
 ```text
-https://khushit-shah.github.io/gater-frontend/
+https://khushitshah.com/gater-frontend/
 ```
 
 ## Data Source
