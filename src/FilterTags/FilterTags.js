@@ -1,133 +1,185 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { FiSearch } from "react-icons/fi";
 import { QuestionService } from "../QuestionService";
 
 const FilterTags = (props) => {
-  let tags = QuestionService.getTags();
+  const tags = QuestionService.getTags();
   const [selectedTags, setSelectedTags1] = useState([]);
   const [value, setValue] = useState("");
   const [isMyInputFocused, setIsMyInputFocused] = useState(false);
+  const containerRef = useRef(null);
 
-  const setSelectedTags = (selectedTags) => {
-    setSelectedTags1(selectedTags);
-    props.tagsSelected(selectedTags);
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsMyInputFocused(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsMyInputFocused(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const setSelectedTags = (nextSelectedTags) => {
+    setSelectedTags1(nextSelectedTags);
+    props.tagsSelected(nextSelectedTags);
   };
+
+  const toggleTag = (option) => {
+    if (selectedTags.includes(option)) {
+      setSelectedTags(selectedTags.filter((tag) => tag !== option));
+    } else {
+      setSelectedTags([...selectedTags, option]);
+    }
+  };
+
+  const gateTags = tags.filter(
+    (option) =>
+      option.toLowerCase().includes(value.toLowerCase()) &&
+      option.toLowerCase().startsWith("gate")
+  );
+  const otherTags = tags.filter(
+    (option) =>
+      option.toLowerCase().includes(value.toLowerCase()) &&
+      !option.toLowerCase().startsWith("gate")
+  );
+
   return (
-    <div className="mb-6 mr-6 relative">
-      <label
-        htmlFor="filter"
-        className="block mb-2  ml-3 mt-2 text-xl font-medium text-gray"
-      >
-        Filter:
-      </label>
-      <input
-        // onBlur={(e) => setIsMyInputFocused(false)}
-        onFocus={() => setIsMyInputFocused(true)}
-        type="text"
-        id="filter"
-        className="ml-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full overflow-visible p-2"
-        placeholder="gate-2023"
-        required
-        list="tags"
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <div className="flex flex-wrap ml-3 list-none">
-        {selectedTags.map((option) => {
-          return (
-            <li className="rounded border ml-1 px-4 py-2 mr-1 mb-1 mt-1">
-              <input
-                type="checkbox"
-                checked={true}
-                key={option}
-                id={option}
-                className={`border-black border ml-1 px-4 py-2 mr-1 mb-1 mt-1`}
-                onChange={(e) => {
-                  setSelectedTags(selectedTags.filter((e) => e !== option));
-                }}
-              />
-              <label className="text-black" htmlFor={option}>
-                {option} x({QuestionService.getCount(option)})
-              </label>
-            </li>
-          );
-        })}
+    <div ref={containerRef} className="relative">
+      <div className="rounded-3xl border border-slate-300 bg-white p-5 shadow-[0_18px_50px_-24px_rgba(15,23,42,0.35)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-black/20">
+        <label
+          htmlFor="filter"
+          className="mb-3 block text-sm font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400"
+        >
+          Filter
+        </label>
+        <div className="relative">
+          <FiSearch className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+          <input
+            onFocus={() => setIsMyInputFocused(true)}
+            type="text"
+            id="filter"
+            className="block w-full rounded-2xl border border-slate-400 bg-slate-50 py-3 pl-12 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-sky-400 dark:focus:bg-slate-900 dark:focus:ring-sky-400/10"
+            placeholder="Search by paper or topic"
+            required
+            list="tags"
+            onChange={(e) => setValue(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-4">
+          <ul className="flex flex-wrap gap-2">
+            {selectedTags.map((option) => (
+              <li key={option}>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-400 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  onClick={() => toggleTag(option)}
+                >
+                  <span>#{option}</span>
+                  <span className="text-slate-400 dark:text-slate-500">×</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {isMyInputFocused && (
-        <ul className="float flex flex-wrap  absolute top-0 left-0  z-10 bg-white border rounded-lg shadow-lg ">
-          <button className="fixed right-7 mr-5 mt-3 text-2xl border border-black  p-0.5" onClick={(e) => {
-            setIsMyInputFocused(false)
-          }}> x </button>
-
-          <div className="flex-none w-[300px]">
-            <p className="text-bold text-xl m-4"> Paper: </p>
-            {tags
-              .filter(
-                (option) =>
-                  option.toLowerCase().includes(value.toLowerCase()) &&
-                  option.toLowerCase().startsWith("gate")
-              )
-              .map((option) => (
-                <li className="rounded border ml-1 px-4 py-2 mr-1 mb-1 mt-1">
-                  <input
-                    type="checkbox"
-                    key={option}
-                    id={option}
-                    checked={selectedTags.includes(option)}
-                    onChange={(e) => {
-                      if (selectedTags.includes(option)) {
-                        setSelectedTags(
-                          selectedTags.filter((s) => s !== option)
-                        );
-                      } else {
-                        setSelectedTags([...selectedTags, option]);
-                      }
-                    }}
-                  />
-                  <label className="ml-4" htmlFor={option}>
-                    {option} x({QuestionService.getCount(option)})
-                  </label>
-                </li>
-              ))}
-          </div>
-          <div className="flex-1 ">
-            <p className="text-bold text-xl m-4"> Tags: </p>
-            <div className="flex flex-wrap">
-              {tags
-                .filter(
-                  (option) =>
-                    option.toLowerCase().includes(value.toLowerCase()) &&
-                    !option.toLowerCase().startsWith("gate")
-                )
-                .map((option) => {
-                  console.log(option);
-                  return (
-                    <>
-                      <li className="rounded border ml-1 px-4 py-2 mr-1 mb-1 mt-1">
-                        <input
-                          type="checkbox"
-                          key={option}
-                          id={option}
-                          checked={selectedTags.includes(option)}
-                          onChange={(e) => {
-                            if (selectedTags.includes(option)) {
-                              setSelectedTags(
-                                selectedTags.filter((s) => s !== option)
-                              );
-                            } else {
-                              setSelectedTags([...selectedTags, option]);
-                            }
-                          }}
-                        />
-                        <label className="ml-4" htmlFor={option}>
-                          {option} x({QuestionService.getCount(option)})
-                        </label>
-                      </li>
-                    </>
-                  );
-                })}
+        <div className="absolute left-0 right-0 top-full z-20 mt-3 overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-[0_28px_70px_-30px_rgba(15,23,42,0.45)] ring-1 ring-black/5 dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex items-center justify-between border-b border-slate-300 px-5 py-4 dark:border-slate-800">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                Suggestions
+              </p>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Click outside or press Esc to close.
+              </p>
+            </div>
+            <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+              {gateTags.length + otherTags.length} results
             </div>
           </div>
-        </ul>
+
+          <div className="grid max-h-[70vh] overflow-auto md:grid-cols-2">
+            <div className="border-b border-slate-300 p-5 md:border-b-0 md:border-r dark:border-slate-800">
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                Paper
+              </p>
+              <ul className="space-y-2">
+                {gateTags.length === 0 ? (
+                  <li className="rounded-2xl border border-dashed border-slate-400 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                    No papers match your search.
+                  </li>
+                ) : (
+                  gateTags.map((option) => (
+                    <li key={option}>
+                      <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-sky-300 hover:bg-sky-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-sky-500/50 dark:hover:bg-slate-800">
+                        <span className="pr-3">
+                          <input
+                            type="checkbox"
+                            id={option}
+                            checked={selectedTags.includes(option)}
+                            onChange={() => toggleTag(option)}
+                            className="mr-3 accent-sky-500"
+                          />
+                          {option}
+                        </span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
+                          {QuestionService.getCount(option)}
+                        </span>
+                      </label>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+
+            <div className="p-5">
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                Tags
+              </p>
+              <ul className="space-y-2">
+                {otherTags.length === 0 ? (
+                  <li className="rounded-2xl border border-dashed border-slate-400 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                    No tags match your search.
+                  </li>
+                ) : (
+                  otherTags.map((option) => (
+                    <li key={option}>
+                      <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:bg-slate-800">
+                        <span className="pr-3">
+                          <input
+                            type="checkbox"
+                            id={option}
+                            checked={selectedTags.includes(option)}
+                            onChange={() => toggleTag(option)}
+                            className="mr-3 accent-emerald-500"
+                          />
+                          {option}
+                        </span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
+                          {QuestionService.getCount(option)}
+                        </span>
+                      </label>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
