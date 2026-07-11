@@ -7,6 +7,9 @@ export class QuestionService {
   static LISTS_STORAGE_KEY = "question-lists";
   static ACTIVE_LIST_STORAGE_KEY = "active-question-list";
   static MARK_TAGS = ["1-mark", "2-marks"];
+  static NO_MARK_TAG = "no-mark";
+  static NO_QUESTION_TYPE_TAG = "no-question-type";
+  static NO_TOPIC_TAG = "no-topic";
   static QUESTION_TYPE_TAGS = [
     "normal",
     "multiple-selects",
@@ -20,11 +23,15 @@ export class QuestionService {
   }
 
   static isMarkTag(tag) {
-    return this.MARK_TAGS.includes(tag);
+    return this.MARK_TAGS.includes(tag) || tag === this.NO_MARK_TAG;
   }
 
   static isQuestionTypeTag(tag) {
-    return this.QUESTION_TYPE_TAGS.includes(tag);
+    return this.QUESTION_TYPE_TAGS.includes(tag) || tag === this.NO_QUESTION_TYPE_TAG;
+  }
+
+  static isTopicAbsenceTag(tag) {
+    return tag === this.NO_TOPIC_TAG;
   }
 
   static shuffleArray(items) {
@@ -90,32 +97,61 @@ export class QuestionService {
 
     const year = new Set();
     const markTags = new Set();
+    let noMarkSelected = false;
     const questionTypeTags = new Set();
+    let noQuestionTypeSelected = false;
     const topicTags = new Set();
+    let noTopicSelected = false;
 
     for (const tag of tags) {
       if (this.isYearTag(tag)) {
         year.add(tag);
-      } else if (this.isMarkTag(tag)) {
+      } else if (tag === this.NO_MARK_TAG) {
+        noMarkSelected = true;
+      } else if (this.MARK_TAGS.includes(tag)) {
         markTags.add(tag);
+      } else if (tag === this.NO_QUESTION_TYPE_TAG) {
+        noQuestionTypeSelected = true;
       } else if (this.isQuestionTypeTag(tag)) {
         questionTypeTags.add(tag);
+      } else if (tag === this.NO_TOPIC_TAG) {
+        noTopicSelected = true;
       } else {
         topicTags.add(tag);
       }
     }
 
     return this.questions.filter((question) => {
+      const questionMarkTags = (question.tags || []).filter((tag) => this.MARK_TAGS.includes(tag));
+      const questionTypeTagMatches = (question.tags || []).filter((tag) =>
+        this.QUESTION_TYPE_TAGS.includes(tag)
+      );
+      const questionTopicTags = (question.tags || []).filter(
+        (tag) =>
+          !this.isYearTag(tag) &&
+          !this.MARK_TAGS.includes(tag) &&
+          !this.QUESTION_TYPE_TAGS.includes(tag)
+      );
       const matchesYear = year.size === 0 || [...year].some((value) => question.tags.includes(value));
       const matchesMark =
-        markTags.size === 0 || [...markTags].some((value) => question.tags.includes(value));
+        (markTags.size === 0 || [...markTags].some((value) => question.tags.includes(value))) &&
+        (!noMarkSelected || questionMarkTags.length === 0);
       const matchesQuestionType =
         questionTypeTags.size === 0 ||
         [...questionTypeTags].some((value) => question.tags.includes(value));
+      const matchesNoQuestionType = !noQuestionTypeSelected || questionTypeTagMatches.length === 0;
       const matchesTopic =
         topicTags.size === 0 || [...topicTags].some((value) => question.tags.includes(value));
+      const matchesNoTopic = !noTopicSelected || questionTopicTags.length === 0;
 
-      return matchesYear && matchesMark && matchesQuestionType && matchesTopic;
+      return (
+        matchesYear &&
+        matchesMark &&
+        matchesQuestionType &&
+        matchesNoQuestionType &&
+        matchesTopic &&
+        matchesNoTopic
+      );
     });
   }
 
@@ -162,6 +198,34 @@ export class QuestionService {
   }
 
   static getCount(tag) {
+    if (tag === this.NO_MARK_TAG) {
+      return this.questions.filter((question) => {
+        const questionMarkTags = (question.tags || []).filter((value) => this.MARK_TAGS.includes(value));
+        return questionMarkTags.length === 0;
+      }).length;
+    }
+
+    if (tag === this.NO_QUESTION_TYPE_TAG) {
+      return this.questions.filter((question) => {
+        const questionTypeTags = (question.tags || []).filter((value) =>
+          this.QUESTION_TYPE_TAGS.includes(value)
+        );
+        return questionTypeTags.length === 0;
+      }).length;
+    }
+
+    if (tag === this.NO_TOPIC_TAG) {
+      return this.questions.filter((question) => {
+        const hasTopic = (question.tags || []).some(
+          (value) =>
+            !this.isYearTag(value) &&
+            !this.MARK_TAGS.includes(value) &&
+            !this.QUESTION_TYPE_TAGS.includes(value)
+        );
+        return !hasTopic;
+      }).length;
+    }
+
     if (this.count.has(tag)) return this.count.get(tag);
     else {
       let cnt = 0;

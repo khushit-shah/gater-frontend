@@ -5,6 +5,7 @@ import { QuestionService } from "../QuestionService";
 const MARK_OPTIONS = [
   { value: "1-mark", label: "1 mark" },
   { value: "2-marks", label: "2 marks" },
+  { value: "no-mark", label: "No mark tag" },
 ];
 
 const QUESTION_TYPE_OPTIONS = [
@@ -13,7 +14,10 @@ const QUESTION_TYPE_OPTIONS = [
   { value: "numerical-answers", label: "Numerical answer" },
   { value: "fill-in-the-blanks", label: "Fill in the blanks" },
   { value: "output", label: "Output" },
+  { value: "no-question-type", label: "No question type" },
 ];
+
+const TOPIC_OPTIONS = [{ value: "no-topic", label: "No topic tags" }];
 
 const FilterTags = (props) => {
   const tags = QuestionService.getTags();
@@ -66,6 +70,7 @@ const FilterTags = (props) => {
       !QuestionService.isYearTag(option) &&
       !QuestionService.isMarkTag(option) &&
       !QuestionService.isQuestionTypeTag(option) &&
+      !QuestionService.isTopicAbsenceTag(option) &&
       matchesQuery(option)
   );
   const markTags = MARK_OPTIONS.filter(
@@ -74,7 +79,11 @@ const FilterTags = (props) => {
   const questionTypeTags = QUESTION_TYPE_OPTIONS.filter(
     (option) => matchesQuery(option.value) || matchesQuery(option.label)
   );
-  const totalResults = gateTags.length + markTags.length + questionTypeTags.length + topicTags.length;
+  const noTopicTags = TOPIC_OPTIONS.filter(
+    (option) => matchesQuery(option.value) || matchesQuery(option.label)
+  );
+  const totalResults =
+    gateTags.length + markTags.length + questionTypeTags.length + topicTags.length + noTopicTags.length;
 
   const renderOptionList = ({
     title,
@@ -220,7 +229,7 @@ const FilterTags = (props) => {
             {renderOptionList({
               title: "Topics",
               emptyText: "No topics match your search.",
-              options: topicTags,
+              options: [...TOPIC_OPTIONS, ...topicTags],
               buttonClassName:
                 "flex cursor-pointer items-center justify-between rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:bg-slate-800",
               accentClassName: "md:col-span-1",
