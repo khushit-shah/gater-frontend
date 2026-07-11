@@ -6,6 +6,26 @@ export class QuestionService {
   static GLOBAL_LIST_STORAGE_KEY = "global-question-list";
   static LISTS_STORAGE_KEY = "question-lists";
   static ACTIVE_LIST_STORAGE_KEY = "active-question-list";
+  static MARK_TAGS = ["1-mark", "2-marks"];
+  static QUESTION_TYPE_TAGS = [
+    "normal",
+    "multiple-selects",
+    "numerical-answers",
+    "fill-in-the-blanks",
+    "output",
+  ];
+
+  static isYearTag(tag) {
+    return tag.startsWith("gate");
+  }
+
+  static isMarkTag(tag) {
+    return this.MARK_TAGS.includes(tag);
+  }
+
+  static isQuestionTypeTag(tag) {
+    return this.QUESTION_TYPE_TAGS.includes(tag);
+  }
 
   static shuffleArray(items) {
     const nextItems = [...items];
@@ -69,11 +89,17 @@ export class QuestionService {
     }
 
     const year = new Set();
+    const markTags = new Set();
+    const questionTypeTags = new Set();
     const topicTags = new Set();
 
     for (const tag of tags) {
-      if (tag.startsWith("gate")) {
+      if (this.isYearTag(tag)) {
         year.add(tag);
+      } else if (this.isMarkTag(tag)) {
+        markTags.add(tag);
+      } else if (this.isQuestionTypeTag(tag)) {
+        questionTypeTags.add(tag);
       } else {
         topicTags.add(tag);
       }
@@ -81,10 +107,15 @@ export class QuestionService {
 
     return this.questions.filter((question) => {
       const matchesYear = year.size === 0 || [...year].some((value) => question.tags.includes(value));
+      const matchesMark =
+        markTags.size === 0 || [...markTags].some((value) => question.tags.includes(value));
+      const matchesQuestionType =
+        questionTypeTags.size === 0 ||
+        [...questionTypeTags].some((value) => question.tags.includes(value));
       const matchesTopic =
         topicTags.size === 0 || [...topicTags].some((value) => question.tags.includes(value));
 
-      return matchesYear && matchesTopic;
+      return matchesYear && matchesMark && matchesQuestionType && matchesTopic;
     });
   }
 
