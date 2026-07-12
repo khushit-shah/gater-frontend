@@ -342,6 +342,7 @@ function App() {
                       totalQuestions={activeQuestions.length}
                       onPrevious={() => stepQuestion(-1)}
                       onNext={() => stepQuestion(1)}
+                      onJumpToIndex={(index) => setCurrentIndex(index)}
                       onTrackEvent={trackEvent}
                     ></Question>
                   </div>

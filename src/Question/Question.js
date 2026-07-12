@@ -2,6 +2,34 @@ import React, { Component } from "react";
 import { MathJax } from "better-react-mathjax";
 
 export default class Question extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { editingIndex: false, draftIndex: "" };
+    this.indexInputRef = React.createRef();
+  }
+
+  startEditing() {
+    this.setState({ editingIndex: true, draftIndex: String(this.props.currentIndex + 1) }, () => {
+      if (this.indexInputRef.current) {
+        this.indexInputRef.current.select();
+      }
+    });
+  }
+
+  commitEdit() {
+    if (!this.state.editingIndex) return;
+    const { totalQuestions, onJumpToIndex } = this.props;
+    const parsed = parseInt(this.state.draftIndex, 10);
+    if (!isNaN(parsed) && parsed >= 1 && parsed <= totalQuestions) {
+      onJumpToIndex(parsed - 1);
+    }
+    this.setState({ editingIndex: false, draftIndex: "" });
+  }
+
+  cancelEdit() {
+    this.setState({ editingIndex: false, draftIndex: "" });
+  }
+
   render() {
     const { question, listName, currentIndex, totalQuestions, onPrevious, onNext, onTrackEvent } =
       this.props;
@@ -22,9 +50,33 @@ export default class Question extends Component {
                   {listName}
                 </p>
               </div>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                {totalQuestions > 0 ? `${currentIndex + 1} / ${totalQuestions}` : "0 / 0"}
-              </p>
+              <div className="flex items-center gap-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                {this.state.editingIndex ? (
+                  <input
+                    ref={this.indexInputRef}
+                    type="number"
+                    min={1}
+                    max={totalQuestions}
+                    value={this.state.draftIndex}
+                    onChange={(e) => this.setState({ draftIndex: e.target.value })}
+                    onBlur={() => this.commitEdit()}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") { e.preventDefault(); this.commitEdit(); }
+                      if (e.key === "Escape") { e.preventDefault(); this.cancelEdit(); }
+                    }}
+                    className="w-14 rounded border border-sky-400 bg-white px-1 py-0 text-center text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400/50 dark:border-sky-500 dark:bg-slate-800 dark:text-slate-200 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  />
+                ) : (
+                  <button
+                    title="Click to jump to a question number"
+                    onClick={() => totalQuestions > 0 && this.startEditing()}
+                    className="rounded px-1 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-400/50"
+                  >
+                    {totalQuestions > 0 ? currentIndex + 1 : 0}
+                  </button>
+                )}
+                <span>/ {totalQuestions}</span>
+              </div>
             </div>
 
             <div className="space-y-3">
