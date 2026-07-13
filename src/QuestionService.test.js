@@ -166,3 +166,9 @@ test("filter: (1-mark OR 2-marks) AND arrays (no year) returns same two array+ma
   const results = QuestionService.getFilteredQuestions(["1-mark", "2-marks", "arrays"]);
   expect(new Set(results.map((q) => q.id))).toEqual(new Set([0, 5]));
 });
+
+test("filter: (1-mark OR no-mark) AND arrays returns questions with 1-mark and arrays (id 0) and no-mark and graphs (id 2)", () => {
+  const results = QuestionService.getFilteredQuestions(["1-mark", QuestionService.NO_MARK_TAG, "arrays", "graphs"]);
+  // id 0 has 1-mark and arrays, id 5 has no-mark and arrays
+  expect(new Set(results.map((q) => q.id))).toEqual(new Set([0, 2]));
+});
