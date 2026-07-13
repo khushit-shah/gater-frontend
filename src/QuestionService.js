@@ -145,25 +145,53 @@ export class QuestionService {
           !this.QUESTION_TYPE_TAGS.includes(tag)
       );
       const matchesYear = year.size === 0 || [...year].some((value) => question.tags.includes(value));
-      const matchesMark =
-        (markTags.size === 0 || [...markTags].some((value) => question.tags.includes(value))) &&
-        (!noMarkSelected || questionMarkTags.length === 0);
-      const matchesQuestionType =
-        questionTypeTags.size === 0 ||
-        [...questionTypeTags].some((value) => question.tags.includes(value));
-      const matchesNoQuestionType = !noQuestionTypeSelected || questionTypeTagMatches.length === 0;
-      const matchesTopic =
-        topicTags.size === 0 || [...topicTags].some((value) => question.tags.includes(value));
-      const matchesNoTopic = !noTopicSelected || questionTopicTags.length === 0;
 
-      return (
-        matchesYear &&
-        matchesMark &&
-        matchesQuestionType &&
-        matchesNoQuestionType &&
-        matchesTopic &&
-        matchesNoTopic
-      );
+      // For marks: support OR between specific mark tags and the "no-mark" selection.
+      let matchesMark;
+      if (markTags.size === 0 && !noMarkSelected) {
+        matchesMark = true;
+      } else {
+        matchesMark = false;
+        if (markTags.size > 0 && [...markTags].some((value) => question.tags.includes(value))) {
+          matchesMark = true;
+        }
+        if (noMarkSelected && questionMarkTags.length === 0) {
+          matchesMark = true;
+        }
+      }
+
+      // For question types: OR between specific types and the "no-question-type" selection.
+      let matchesQuestionType;
+      if (questionTypeTags.size === 0 && !noQuestionTypeSelected) {
+        matchesQuestionType = true;
+      } else {
+        matchesQuestionType = false;
+        if (
+          questionTypeTags.size > 0 &&
+          [...questionTypeTags].some((value) => question.tags.includes(value))
+        ) {
+          matchesQuestionType = true;
+        }
+        if (noQuestionTypeSelected && questionTypeTagMatches.length === 0) {
+          matchesQuestionType = true;
+        }
+      }
+
+      // For topics: OR between specific topic tags and the "no-topic" selection.
+      let matchesTopic;
+      if (topicTags.size === 0 && !noTopicSelected) {
+        matchesTopic = true;
+      } else {
+        matchesTopic = false;
+        if (topicTags.size > 0 && [...topicTags].some((value) => question.tags.includes(value))) {
+          matchesTopic = true;
+        }
+        if (noTopicSelected && questionTopicTags.length === 0) {
+          matchesTopic = true;
+        }
+      }
+
+      return matchesYear && matchesMark && matchesQuestionType && matchesTopic;
     });
   }
 
