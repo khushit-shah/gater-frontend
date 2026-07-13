@@ -147,3 +147,22 @@ test("getCount returns correct counts including special no- tags", () => {
   // No-topic should be ids 3 and 4
   expect(QuestionService.getCount(QuestionService.NO_TOPIC_TAG)).toBe(2);
 });
+
+// Tests for OR within a section (marks) and AND between sections (marks + topic + year)
+
+test("filter: marks OR (1-mark or 2-marks) returns union of both marks", () => {
+  const results = QuestionService.getFilteredQuestions(["1-mark", "2-marks"]);
+  // ids with 1-mark: 0,3; with 2-marks: 1,5 => union [0,1,3,5]
+  expect(new Set(results.map((q) => q.id))).toEqual(new Set([0, 1, 3, 5]));
+});
+
+test("filter: (1-mark OR 2-marks) AND arrays AND gate-2020 (OR in section, AND between sections)", () => {
+  const results = QuestionService.getFilteredQuestions(["1-mark", "2-marks", "arrays", "gate-2020"]);
+  // Should match questions that have (1-mark OR 2-marks) AND arrays AND gate-2020 => ids 0 and 5
+  expect(new Set(results.map((q) => q.id))).toEqual(new Set([0, 5]));
+});
+
+test("filter: (1-mark OR 2-marks) AND arrays (no year) returns same two array+mark questions", () => {
+  const results = QuestionService.getFilteredQuestions(["1-mark", "2-marks", "arrays"]);
+  expect(new Set(results.map((q) => q.id))).toEqual(new Set([0, 5]));
+});
